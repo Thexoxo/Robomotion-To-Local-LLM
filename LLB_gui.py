@@ -18,56 +18,14 @@ import webbrowser
 import json
 import urllib.request
 import urllib.error
-import urllib.parse
 
-def load_env(env_path):
-    if os.path.exists(env_path):
-        with open(env_path, 'r', encoding='utf-8') as f:
-            for line in f:
-                if '=' in line and not line.startswith('#'):
-                    key, val = line.strip().split('=', 1)
-                    os.environ[key] = val
-
-# --- PROMPT AGENT ---
-AGENT_PROMPT = """# SYSTEM INSTRUCTIONS: EXPERT DEVELOPER ROBOMOTION RPA
-
-[CONTEXT AND ROLE]
-You are an elite development agent for Robomotion RPA working in a Centralized Workspace. Your mission is to design from scratch, modify, and deploy a 100% autonomous automation flow. You will write the required 'main.ts' and 'main.designer.ts' files inside the specific project's subfolder, then push them to the remote Git repository.
-
-[STEP 1: SIMULTANEOUS LEARNING (MANDATORY)]
-Before writing any code, you must deeply analyze the official SDK documentation, grammar, and design patterns stored locally on this machine at the following exact path:
-"../skills-fallback/skills/creating-flow/docs/"
-
-[STEP 2: IRON LAWS OF SYNTAX (STRICT COMPLIANCE REQUIRED)]
-For the code to be valid and accepted by Robomotion, you must apply these 5 laws:
-1. COMPLETE LINE 1: The 'main.ts' file must strictly start with the following exact import:
-import { flow, Message, Custom, JS, Global, Flow, Credential, AI } from '@robomotion/sdk';
-
-2. HEX-6 NODE IDs: All node identifiers (node IDs) in the flow must be 6-character lowercase hexadecimal strings (e.g., '42ec21', '7dbafc'). It is strictly FORBIDDEN to use plain text (like 'begin', 'loop', 'label').
-
-3. PROPERTY ENCAPSULATION: Never pass raw primitive values to node options. Always use the Custom('value') or Message('variable') helpers (Example: optTimeout: Custom('30')).
-
-4. LOOP PATTERNS: Strictly apply the structure: Label (Hex-6 ID) -> ForEach -> [Code Body] -> GoTo (the GoTo must explicitly jump to the Hex-6 ID of the Label node).
-
-5. DATA TABLE FORMAT: For any data manipulation (CSV, Excel), the msg.table property must strictly follow this JSON object structure: { columns: [...], rows: [...] }.
-
-[STEP 3: DEPLOYMENT AND AUTO-PUSH PROCESS]
-Once you have written the 'main.ts' and 'main.designer.ts' files in the target project folder without errors, you are authorized to open the system terminal, navigate to the specific project folder (cd ./ProjectFolder), and autonomously execute the following sequence of Git commands to publish the flow to the Cloud:
-1. git add .
-2. git commit -m "Automated workflow generation and sync by AI Agent"
-3. git push origin main
-
-[YOUR MISSION]
-Design the complete 'main.ts' and 'main.designer.ts' files for my project subfolder, validate them, then execute the Auto-Push process from inside that folder for the following action:
---> [WRITE YOUR SPECIFIC GOAL HERE, EX: A robot that logs into a site, scrapes a data table, and saves it as CSV] <--
-"""
+# The agent prompt is now loaded dynamically from prompt_template.md
 
 def create_github_repo(username, pat, repo_name):
     url = "https://api.github.com/user/repos"
     headers = {
-        "Authorization": f"Bearer {pat}",
-        "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "Local-LLM-to-Robomotion-Bridge"
+        "Authorization": f"token {pat}",
+        "Accept": "application/vnd.github.v3+json"
     }
     data = {
         "name": repo_name,
@@ -106,33 +64,33 @@ def setup_workspace():
         
         # Paths definition
         desktop = Path(os.path.expanduser("~")) / "Desktop"
-        master_workspace = desktop / "Robomotion_Workspace"
-        master_workspace.mkdir(parents=True, exist_ok=True)
-        
-        project_dir = master_workspace / project_name_clean
-        project_dir.mkdir(parents=True, exist_ok=True)
+        workspace = desktop / project_name_clean
         
         script_dir = Path(__file__).parent
         source_docs = script_dir / 'skills-fallback'
         
-        # Centralized documentation
-        dest_skills = master_workspace / "skills-fallback"
+        workspace.mkdir(parents=True, exist_ok=True)
+        
+        dest_skills = workspace / "skills-fallback"
         if source_docs.exists() and not dest_skills.exists():
             shutil.copytree(source_docs, dest_skills)
         elif not source_docs.exists():
             messagebox.showwarning("Warning", "The 'skills-fallback' folder was not found next to the installer. The AI will lack documentation.")
             
-        # Agent rules placed directly inside the project folder for immediate AI access
-        with open(project_dir / "agent_rules.md", "w", encoding="utf-8") as f:
-            f.write(AGENT_PROMPT)
+        # Copy the agent prompt from the local template
+        template_path = script_dir / 'prompt_template.md'
+        dest_prompt = workspace / "agent_rules.md"
+        if template_path.exists():
+            shutil.copy2(template_path, dest_prompt)
+        else:
+            messagebox.showwarning("Warning", "prompt_template.md not found. AI rules were not copied.")
             
-        # Project specific files
-        with open(project_dir / "main.ts", "w", encoding="utf-8") as f:
+        with open(workspace / "main.ts", "w", encoding="utf-8") as f:
             f.write("import { flow, Message, Custom, JS, Global, Flow, Credential, AI } from '@robomotion/sdk';\n\nconst myFlow = flow.create('main', 'New Flow', (f) => {});\nmyFlow.start();")
-        with open(project_dir / "main.designer.ts", "w", encoding="utf-8") as f:
+        with open(workspace / "main.designer.ts", "w", encoding="utf-8") as f:
             f.write("import { flow, Message, Custom, JS, Global, Flow, Credential, AI } from '@robomotion/sdk';\n\nconst myFlow = flow.create('main', 'New Flow', (f) => {});\nmyFlow.start();")
             
-        with open(project_dir / ".env", "w", encoding="utf-8") as f:
+        with open(workspace / ".env", "w", encoding="utf-8") as f:
             f.write(f"GITHUB_USERNAME={username}\nGITHUB_PAT={pat}\nGITHUB_REPO={repo_url}\n")
             
         repo_clean = repo_url.replace("https://", "")
@@ -142,19 +100,19 @@ def setup_workspace():
         auth_url = f"https://{safe_username}:{pat}@{repo_clean}"
         
         cflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
-        if not (project_dir / '.git').exists():
-            subprocess.run(['git', 'init'], cwd=project_dir, check=True, creationflags=cflags)
+        if not (workspace / '.git').exists():
+            subprocess.run(['git', 'init'], cwd=workspace, check=True, creationflags=cflags)
             
-        subprocess.run(['git', 'add', '.'], cwd=project_dir, check=True, creationflags=cflags)
-        subprocess.run(['git', 'commit', '-m', 'Workspace initialization via GitHub API'], cwd=project_dir, capture_output=True, creationflags=cflags)
-        subprocess.run(['git', 'remote', 'remove', 'origin'], cwd=project_dir, capture_output=True, creationflags=cflags)
-        subprocess.run(['git', 'remote', 'add', 'origin', auth_url], cwd=project_dir, check=True, creationflags=cflags)
-        subprocess.run(['git', 'branch', '-M', 'main'], cwd=project_dir, check=True, creationflags=cflags)
-        subprocess.run(['git', 'push', '-u', 'origin', 'main'], cwd=project_dir, check=True, creationflags=cflags)
+        subprocess.run(['git', 'add', '.'], cwd=workspace, check=True, creationflags=cflags)
+        subprocess.run(['git', 'commit', '-m', 'Workspace initialization via GitHub API'], cwd=workspace, capture_output=True, creationflags=cflags)
+        subprocess.run(['git', 'remote', 'remove', 'origin'], cwd=workspace, capture_output=True, creationflags=cflags)
+        subprocess.run(['git', 'remote', 'add', 'origin', auth_url], cwd=workspace, check=True, creationflags=cflags)
+        subprocess.run(['git', 'branch', '-M', 'main'], cwd=workspace, check=True, creationflags=cflags)
+        subprocess.run(['git', 'push', '-u', 'origin', 'main'], cwd=workspace, check=True, creationflags=cflags)
         
-        msg = (f"✅ Workspace 'Robomotion_Workspace/{project_name_clean}' successfully created!\n"
-               f"✅ GitHub Repository '{project_name_clean}' automatically created via API.\n\n"
-               "Open 'Robomotion_Workspace' in your AI to see all your bots.")
+        msg = (f"✅ Workspace '{project_name}' successfully created!\n"
+               f"✅ GitHub Repository '{project_name}' automatically created via API.\n\n"
+               "Please read the README.md file to know how to pilot your AI.")
         messagebox.showinfo("Success", msg)
         root.destroy()
         
@@ -166,12 +124,6 @@ def open_youtube():
 
 def open_github():
     webbrowser.open("https://github.com/Thexoxo")
-
-def open_kofi():
-    webbrowser.open("https://ko-fi.com/thexoxo")
-
-def open_bmac():
-    webbrowser.open("https://buymeacoffee.com/thexoxo")
 
 # --- UI ---
 root = tk.Tk()
@@ -198,29 +150,20 @@ tk.Label(frame, text="PAT Token (Key):").grid(row=2, column=0, sticky="w", pady=
 entry_pat = tk.Entry(frame, width=45, show="*")
 entry_pat.grid(row=2, column=1, pady=5, padx=5)
 
-# Load .env variables if they exist
-env_file = Path(__file__).parent / ".env"
-load_env(env_file)
-if os.environ.get("GITHUB_USERNAME"):
-    entry_user.insert(0, os.environ.get("GITHUB_USERNAME"))
-if os.environ.get("GITHUB_PAT"):
-    entry_pat.insert(0, os.environ.get("GITHUB_PAT"))
-
 tk.Button(root, text="🔥 Auto-Create Repo & Generate Workspace", bg="#2c3e50", fg="white", font=("Helvetica", 11, "bold"), command=setup_workspace).pack(pady=15)
 
 # --- HOW TO USE (ENGLISH) ---
 instructions_frame = tk.LabelFrame(root, text=" 📖 How to use this tool? (Tutorial) ", font=("Helvetica", 10, "bold"), padx=15, pady=15)
 instructions_frame.pack(fill="both", expand=True, pady=10)
 
-instructions_text = """Step 1: Generate a GitHub PAT (Classic Token) with 'repo' 
-permissions enabled! Then, fill out the fields above. The software 
-will auto-create a private repository using the API.
+instructions_text = """Step 1: Fill out the fields above. The software will auto-create 
+a private repository on your GitHub using the API.
 
-Step 2: Open your local LLM / AI Agent (Anti Gravity, LM Studio) 
-in your specific project folder. 
-Give it the prompt: "Read agent_rules.md and build the flow"
+Step 2: Open your local LLM / AI Agent (Anti Gravity, LM Studio, IDE) 
+in the generated folder on your Desktop. Give it the prompt: 
+"Read agent_rules.md and build the automation flow."
 
-Step 3: AUTO-SYNC! Let the AI write the code. This script 
+Step 3: AUTO-SYNC! Let the AI write the code. This background script 
 will automatically push the generated code directly to GitHub.
 
 Step 4: Go to Robomotion Designer -> Click 'Import Flow' -> 'From Git'.
@@ -232,14 +175,9 @@ Step 4: Go to Robomotion Designer -> Click 'Import Flow' -> 'From Git'.
 tk.Label(instructions_frame, text=instructions_text, justify="left", font=("Consolas", 9), fg="#333333").pack(anchor="w")
 
 links_frame = tk.Frame(root)
-links_frame.pack(side="bottom", fill="x", pady=5)
+links_frame.pack(side="bottom")
 
-tk.Button(links_frame, text="▶️ YouTube", command=open_youtube, cursor="hand2", bg="#ff0000", fg="white", font=("Helvetica", 9, "bold")).pack(side="left", padx=5)
-tk.Button(links_frame, text="🐙 GitHub", command=open_github, cursor="hand2", bg="#333333", fg="white", font=("Helvetica", 9, "bold")).pack(side="left", padx=5)
-tk.Button(links_frame, text="☕ Ko-fi", command=open_kofi, cursor="hand2", bg="#29abe0", fg="white", font=("Helvetica", 9, "bold")).pack(side="left", padx=5)
-tk.Button(links_frame, text="💛 BMAC", command=open_bmac, cursor="hand2", bg="#ffdd00", fg="black", font=("Helvetica", 9, "bold")).pack(side="left", padx=5)
-
-signature = tk.Label(links_frame, text="Made with 🌍 ❤️ by xoxo", font=("Helvetica", 9, "italic"), fg="#666666")
-signature.pack(side="right", padx=10)
+tk.Button(links_frame, text="▶️ YouTube", command=open_youtube, cursor="hand2", bg="#ff0000", fg="white", font=("Helvetica", 9, "bold")).pack(side="left", padx=10)
+tk.Button(links_frame, text="🐙 GitHub", command=open_github, cursor="hand2", bg="#333333", fg="white", font=("Helvetica", 9, "bold")).pack(side="left", padx=10)
 
 root.mainloop()
