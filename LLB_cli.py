@@ -21,8 +21,9 @@ from pathlib import Path
 def create_github_repo(username, pat, repo_name):
     url = "https://api.github.com/user/repos"
     headers = {
-        "Authorization": f"token {pat}",
-        "Accept": "application/vnd.github.v3+json"
+        "Authorization": f"Bearer {pat}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "Local-LLM-to-Robomotion-Bridge"
     }
     data = {
         "name": repo_name,
