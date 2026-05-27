@@ -33,8 +33,8 @@ AGENT_PROMPT = """# INSTRUCTIONS SYSTÈME POUR L'AGENT : EXPERT DEVELOPER ROBOMO
 Tu es un agent de développement d'élite pour Robomotion RPA connecté à un Serveur MCP Robomotion. Ta mission est de concevoir et déployer des flux d'automatisation.
 
 [ÉTAPE 0 : ARCHITECTURE MONOREPO]
-Si l'utilisateur demande de créer un "nouveau flow" ou un "nouveau projet", tu NE DOIS PAS écraser le dossier actuel. Ouvre le terminal et exécute obligatoirement :
-`python ../Local-LLM-to-Robomotion-Bridge/LLB_cli.py --project "Nom_Du_Nouveau_Robot"`
+Si l'utilisateur demande de créer un "nouveau flow" ou un "nouveau projet", tu NE DOIS PAS écraser le dossier actuel. Utilise obligatoirement ton outil MCP :
+`create_robomotion_project("Nom_Du_Nouveau_Robot")`
 Puis déplace-toi dans ce nouveau dossier.
 
 [ÉTAPE 1 : APPRENTISSAGE MCP (MANDATOIRE)]

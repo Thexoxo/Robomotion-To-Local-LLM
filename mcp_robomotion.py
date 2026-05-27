@@ -71,6 +71,41 @@ def search_node_package(query: str) -> str:
         return f"Aucune information trouvée pour le noeud: {query}"
     return "\n".join(results[:5])
 
+@mcp.tool()
+def get_cli_instructions() -> str:
+    """
+    Retourne le manuel complet des commandes CLI Robomotion (robomotion search, get, describe, docs)
+    pour trouver des packages, noeuds et templates directement via le terminal.
+    """
+    cli_path = SKILLS_PATH / "skills" / "searching-packages" / "SKILL.md"
+    if not cli_path.exists():
+        return "Erreur: Fichier SKILL.md de la CLI introuvable."
+    with open(cli_path, "r", encoding="utf-8") as f:
+        return f.read()
+
+@mcp.tool()
+def create_robomotion_project(project_name: str) -> str:
+    """
+    Crée un NOUVEAU projet Robomotion (ou synchronise un existant) via LLB_cli.py.
+    Prépare l'espace de travail local et le dépôt GitHub automatiquement.
+    """
+    import subprocess
+    bridge_dir = SKILLS_PATH.parent
+    try:
+        # Exécute LLB_cli.py qui s'occupe de lire le .env et de créer/pusher le projet
+        result = subprocess.run(
+            ['python', 'LLB_cli.py', '--project', project_name],
+            cwd=str(bridge_dir),
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return f"Succès ! Projet '{project_name}' préparé.\nLogs:\n{result.stdout}"
+    except subprocess.CalledProcessError as e:
+        return f"Erreur lors de la création du projet.\nLogs d'erreur:\n{e.output}\n{e.stderr}"
+    except Exception as e:
+        return f"Erreur fatale: {str(e)}"
+
 if __name__ == "__main__":
     print("Démarrage du Serveur MCP Robomotion Expert...")
     mcp.run()
