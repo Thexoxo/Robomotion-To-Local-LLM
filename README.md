@@ -1,73 +1,71 @@
-# 🚀 Local LLM to Robomotion Bridge - How to Use
+# 🚀 Local LLM to Robomotion Bridge (MCP Edition)
 
 **What is this tool?**
-The *Local LLM to Robomotion Bridge* is a 1-click open-source tool designed to seamlessly connect your local, free AI (like LM Studio, Ollama, or Anti Gravity) with the Robomotion RPA platform. It allows you to build powerful, autonomous automation robots (RPA) directly on your local machine without paying for expensive AI API tokens, and syncs the generated code directly to your Robomotion cloud workspace.
+The *Local LLM to Robomotion Bridge* is a 1-click open-source tool designed to seamlessly connect your local, free AI (like LM Studio, Ollama, or Anti Gravity) with the Robomotion RPA platform. 
+Instead of relying on unstable prompts, this bridge uses a **Model Context Protocol (MCP) Server** as its core engine. The MCP Server acts as an infallible "brain extension" for your AI, allowing it to dynamically read Robomotion's official documentation, grammar, and node packages *before* generating any code. This guarantees a **Zero-Hallucination** environment.
 
-Welcome to the Local LLM to Robomotion Bridge! Follow the steps below to setup your factory.
+## 🧠 Step 1: The Core Engine (MCP Server) - MANDATORY
 
-## 📖 Step-by-Step Tutorial
+The entire intelligence of this bridge relies on `mcp_robomotion.py`. You **MUST** configure this server in your AI Agent's IDE (Cursor, Claude Desktop, Anti-Gravity, etc.).
 
-### Step 1: Generate your GitHub PAT (Personal Access Token)
-Before running the setup, you must generate a GitHub Token:
+1. Locate the `mcp_config.example.json` file in this repository.
+2. Create or update your AI's MCP configuration file (for example, `mcp_config.json` in your AI's configuration folder).
+3. Add the `robomotion_expert` server pointing to the absolute path of `mcp_robomotion.py` using Python.
+
+Example configuration:
+```json
+{
+  "mcpServers": {
+    "robomotion_expert": {
+      "command": "python",
+      "args": [
+        "C:\\Absolute\\Path\\To\\Local-LLM-to-Robomotion-Bridge\\mcp_robomotion.py"
+      ]
+    }
+  }
+}
+```
+*Once this is loaded, your AI will have access to 4 powerful tools: `list_robomotion_documentation`, `read_robomotion_documentation`, `search_node_package`, and `get_cli_instructions`.*
+
+## 📖 Step 2: Generate your GitHub PAT (Personal Access Token)
+To allow your AI to automatically push flows to the Cloud:
 1. Go to your GitHub account **Settings** > **Developer Settings** > **Personal access tokens** > **Tokens (classic)**.
 2. Click **Generate new token (classic)** (Do NOT select "Fine-grained token").
-3. Give it a name and **check the `repo` checkbox** (this grants full control of private repositories).
+3. Give it a name and **check the `repo` checkbox**.
 4. Click Generate and copy the token (`ghp_...`).
 
-### Step 2: Run the Setup
-Launch `LLB_gui.py` (or use `LLB_cli.py` in the terminal). Fill out the fields:
-- **Project Name**: The folder name that will be created on your Desktop. It will also be the name of your auto-created GitHub repository!
-- **GitHub Username**: Your GitHub handle.
-- **PAT Token**: The GitHub Personal Access Token you just created.
+## ⚙️ Step 3: Configure the Environment
+To avoid passing your token in the command line history, create a `.env` file in the same folder as `LLB_cli.py` containing:
+```env
+GITHUB_USERNAME=YourUsername
+GITHUB_PAT=ghp_xxxx...
+```
 
-Click the "🔥 Auto-Create Repo & Generate Workspace" button. The software will use the GitHub API to magically create the private repository for you, create the local folder, copy the Robomotion documentation, create the rules for your AI (`agent_rules.md`), and securely sync everything to your GitHub.
+## 🤖 Step 4: AI Workflow (Zero-Touch Automation)
+With the MCP server running and your credentials saved, your AI Agent only needs a tiny instruction:
 
-### Step 3: Boot your Local AI
-Open your local AI agent (like **LM Studio**, **Anti Gravity**, **Cursor**, etc.) and load your newly created specific project folder (inside `Robomotion_Workspace`) on your Desktop.
+> *"Tu es un expert Robomotion RPA connecté à un Serveur MCP Robomotion. Utilise tes outils MCP pour lire la documentation, et crée le projet 'my_new_bot' via LLB_cli.py."*
 
-Give it the following instruction:
-> *"Read the `agent_rules.md` file and build the automation flow."*
+The AI will automatically:
+1. Run `python LLB_cli.py --project "my_new_bot"` to generate the Git Monorepo workspace.
+2. Enter the new workspace.
+3. Consult the Robomotion SDK documentation via its MCP tools.
+4. Generate the `main.ts` and `main.designer.ts` files perfectly.
+5. Auto-Push the files to GitHub (`git add .`, `git commit`, `git push`).
 
-### Step 4: Let the AI Auto-Sync
-The AI will generate the TypeScript code (`main.ts`).
-As soon as the code is saved, our background Auto-Push logic automatically synchronizes and pushes the files straight to your GitHub repository! You don't have to type any git commands.
-
-### Step 5: Import into Robomotion Designer
+## 📥 Step 5: Import into Robomotion Designer
 Finally, import the AI's work into the Robomotion Cloud interface:
 1. Go to Robomotion Designer.
 2. Click **'Import Flow'** -> **'From Git'**.
 
 ⚠️ **CRITICAL - Fill the popup EXACTLY like this:**
 - **Git URL**: Your GitHub Repository link (`https://github.com/User/Repo.git`)
-- **Branch**: `main` *(DO NOT put your email address here!)*
-- **Authentication Token**: Your GitHub PAT (the same key used in step 1).
-- **Auth Username**: (Leave Empty or Optional)
+- **Branch**: `main`
+- **Authentication Token**: Your GitHub PAT.
+- **Auth Username**: (Leave Empty)
 - **Flow Name**: Your project name.
 
-Click **Import** and your flow will instantly appear!
-
----
-
-## 🤖 Headless / AI Automation (CLI)
-
-If you are an AI Agent (like Anti Gravity) or want to automate the workspace creation without the graphical interface, you can use the CLI tool **`LLB_cli.py`**.
-
-### Usage with arguments:
-```bash
-python LLB_cli.py --project "my_new_bot" --username "Thexoxo" --pat "ghp_xxxx..."
-```
-
-### Usage with `.env` file (Recommended for Security):
-To avoid passing your token in the command line history, create a `.env` (or `.txt`) file in the same folder as `LLB_cli.py` containing:
-```env
-GITHUB_USERNAME=Thexoxo
-GITHUB_PAT=ghp_xxxx...
-```
-Then, the AI only needs to run:
-```bash
-python LLB_cli.py --project "my_new_bot"
-```
-*The CLI will automatically read your credentials from the `.env` file and generate the entire Monorepo workspace in 1 second!*
+Click **Import** and your autonomous robot is ready!
 
 ---
 

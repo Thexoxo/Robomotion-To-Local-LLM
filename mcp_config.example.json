@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "robomotion_expert": {
+      "command": "python",
+      "args": [
+        "C:\\Absolute\\Path\\To\\Local-LLM-to-Robomotion-Bridge\\mcp_robomotion.py"
+      ]
+    }
+  }
+}
