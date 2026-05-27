@@ -108,9 +108,9 @@ def setup_workspace(project_name, username, pat):
         if status.stdout.strip():
             subprocess.run(['git', 'commit', '-m', 'Automated sync via LLB_cli'], cwd=project_dir, capture_output=True, creationflags=cflags)
             subprocess.run(['git', 'push', 'origin', 'main'], cwd=project_dir, check=True, creationflags=cflags)
-            print(f"✅ Code synchronisé et poussé sur GitHub avec succès ({project_name_clean})")
+            print(f"[+] Code synchronisé et poussé sur GitHub avec succès ({project_name_clean})")
         else:
-            print("✅ Aucun changement détecté. Le code est déjà à jour.")
+            print("[+] Aucun changement détecté. Le code est déjà à jour.")
         return
 
     # --- LOGIQUE DE CRÉATION DE PROJET ---
@@ -162,7 +162,7 @@ def setup_workspace(project_name, username, pat):
     subprocess.run(['git', 'branch', '-M', 'main'], cwd=project_dir, check=True, creationflags=cflags)
     subprocess.run(['git', 'push', '-u', 'origin', 'main'], cwd=project_dir, check=True, creationflags=cflags)
     
-    print("\n✅ Success! Workspace generated and synced to GitHub.")
+    print("\n[+] Success! Workspace generated and synced to GitHub.")
     print("   Open 'Robomotion_Workspace' in your AI to begin.")
 
 if __name__ == "__main__":
