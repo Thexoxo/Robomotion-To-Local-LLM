@@ -48,6 +48,29 @@ Click **Import** and your flow will instantly appear!
 
 ---
 
+## 🤖 Headless / AI Automation (CLI)
+
+If you are an AI Agent (like Anti Gravity) or want to automate the workspace creation without the graphical interface, you can use the CLI tool **`LLB_cli.py`**.
+
+### Usage with arguments:
+```bash
+python LLB_cli.py --project "my_new_bot" --username "Thexoxo" --pat "ghp_xxxx..."
+```
+
+### Usage with `.env` file (Recommended for Security):
+To avoid passing your token in the command line history, create a `.env` (or `.txt`) file in the same folder as `LLB_cli.py` containing:
+```env
+GITHUB_USERNAME=Thexoxo
+GITHUB_PAT=ghp_xxxx...
+```
+Then, the AI only needs to run:
+```bash
+python LLB_cli.py --project "my_new_bot"
+```
+*The CLI will automatically read your credentials from the `.env` file and generate the entire Monorepo workspace in 1 second!*
+
+---
+
 ### Links
 - 📺 [YouTube Channel](https://www.youtube.com/@xoxoPwn)
 - 🐙 [GitHub Profile](https://github.com/Thexoxo)

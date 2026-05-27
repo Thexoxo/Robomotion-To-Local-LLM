@@ -18,6 +18,14 @@ import urllib.parse
 import argparse
 from pathlib import Path
 
+def load_env(env_path):
+    if os.path.exists(env_path):
+        with open(env_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if '=' in line and not line.startswith('#'):
+                    key, val = line.strip().split('=', 1)
+                    os.environ[key] = val
+
 # --- PROMPT AGENT ---
 AGENT_PROMPT = """# SYSTEM INSTRUCTIONS: EXPERT DEVELOPER ROBOMOTION RPA
 
@@ -137,10 +145,21 @@ def setup_workspace(project_name, username, pat):
     print("   Open 'Robomotion_Workspace' in your AI to begin.")
 
 if __name__ == "__main__":
+    env_file = Path(__file__).parent / ".env"
+    load_env(env_file)
+    
     parser = argparse.ArgumentParser(description="Local LLM to Robomotion Bridge (CLI)")
     parser.add_argument("-p", "--project", required=True, help="Project name (Folder & Repo)")
-    parser.add_argument("-u", "--username", required=True, help="GitHub Username")
-    parser.add_argument("-t", "--pat", required=True, help="GitHub PAT Token")
+    parser.add_argument("-u", "--username", required=False, help="GitHub Username (or set in .env)")
+    parser.add_argument("-t", "--pat", required=False, help="GitHub PAT Token (or set in .env)")
     
     args = parser.parse_args()
-    setup_workspace(args.project, args.username, args.pat)
+    
+    username = args.username or os.environ.get("GITHUB_USERNAME")
+    pat = args.pat or os.environ.get("GITHUB_PAT")
+    
+    if not username or not pat:
+        print("[!] Error: You must provide a username and PAT either via arguments (-u, -t) or in a .env file.")
+        exit(1)
+        
+    setup_workspace(args.project, username, pat)
