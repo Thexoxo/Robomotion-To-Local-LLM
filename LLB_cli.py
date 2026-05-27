@@ -37,9 +37,10 @@ Si l'utilisateur te demande de créer un NOUVEAU robot, tu ne dois JAMAIS écras
 `python ../Local-LLM-to-Robomotion-Bridge/LLB_cli.py --project "Nom_Du_Nouveau_Robot"`
 Cela va générer le sous-dossier, l'isolation Git et préparer le terrain. Ensuite, déplace-toi dans ce nouveau dossier pour coder.
 
-[STEP 1: SIMULTANEOUS LEARNING (MANDATORY)]
-Before writing any code, you must deeply analyze the official SDK documentation, grammar, and design patterns stored locally on this machine at the following exact path:
+[ÉTAPE 1 : APPRENTISSAGE SIMULTANÉ (MANDATOIRE)]
+Avant d'écrire la moindre ligne de code, tu dois OBLIGATOIREMENT utiliser tes outils d'analyse de fichiers (ex: `list_dir`, `view_file`) pour lire physiquement les fichiers de documentation stockés dans ce dossier local :
 "../skills-fallback/skills/creating-flow/docs/"
+Sans cette lecture physique par tes outils, tu vas halluciner la syntaxe. Ne génère aucun code tant que tu n'as pas lu `sdk-grammar.md`.
 
 [STEP 2: IRON LAWS OF SYNTAX (STRICT COMPLIANCE REQUIRED)]
 For the code to be valid and accepted by Robomotion, you must apply these 5 laws:

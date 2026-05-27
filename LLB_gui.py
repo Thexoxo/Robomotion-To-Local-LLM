@@ -40,8 +40,9 @@ Si (et SEULEMENT si) l'utilisateur te demande de créer un nouveau robot en empl
 Cela générera un nouveau sous-dossier vierge. Ensuite, déplace-toi dans ce nouveau dossier pour coder. (Si l'utilisateur demande juste une modification d'un robot existant, ignore cette étape et reste dans le dossier actuel).
 
 [ÉTAPE 1 : APPRENTISSAGE SIMULTANÉ (MANDATOIRE)]
-Before writing any code, you must deeply analyze the official SDK documentation, grammar, and design patterns stored locally on this machine at the following exact path:
+Avant d'écrire la moindre ligne de code, tu dois OBLIGATOIREMENT utiliser tes outils d'analyse de fichiers (ex: `list_dir`, `view_file`) pour lire physiquement les fichiers de documentation stockés dans ce dossier local :
 "../skills-fallback/skills/creating-flow/docs/"
+Sans cette lecture physique par tes outils, tu vas halluciner la syntaxe. Ne génère aucun code tant que tu n'as pas lu `sdk-grammar.md`.
 
 [STEP 2: IRON LAWS OF SYNTAX (STRICT COMPLIANCE REQUIRED)]
 For the code to be valid and accepted by Robomotion, you must apply these 5 laws:
