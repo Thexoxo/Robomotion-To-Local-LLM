@@ -91,6 +91,17 @@ def setup_workspace(project_name, username, pat):
     # --- LOGIQUE DE MISE À JOUR (AUTO-PUSH) ---
     if (project_dir / '.git').exists():
         print(f"[*] Le projet '{project_name_clean}' existe déjà. Mode synchronisation activé.")
+        
+        # VALIDATION DU CODE AVANT TOUT PUSH !
+        main_ts_path = project_dir / "main.ts"
+        if main_ts_path.exists():
+            import LLB_validator
+            success, msg = LLB_validator.validate_main_ts(main_ts_path)
+            if not success:
+                print(f"[!] ERREUR DE VALIDATION DU CODE ROBOMOTION :\n{msg}")
+                print("[!] Le Push est annulé. L'IA doit corriger ces erreurs.")
+                exit(1)
+        
         subprocess.run(['git', 'add', '.'], cwd=project_dir, check=True, creationflags=cflags)
         
         # S'il y a des changements, on commit et on push
