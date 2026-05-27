@@ -91,6 +91,29 @@ def create_github_repo(username, pat, repo_name):
 def setup_workspace(project_name, username, pat):
     project_name_clean = project_name.replace(" ", "-")
     
+    desktop = Path(os.path.expanduser("~")) / "Desktop"
+    master_workspace = desktop / "Robomotion_Workspace"
+    master_workspace.mkdir(parents=True, exist_ok=True)
+    project_dir = master_workspace / project_name_clean
+    
+    cflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+    
+    # --- LOGIQUE DE MISE À JOUR (AUTO-PUSH) ---
+    if (project_dir / '.git').exists():
+        print(f"[*] Le projet '{project_name_clean}' existe déjà. Mode synchronisation activé.")
+        subprocess.run(['git', 'add', '.'], cwd=project_dir, check=True, creationflags=cflags)
+        
+        # S'il y a des changements, on commit et on push
+        status = subprocess.run(['git', 'status', '--porcelain'], cwd=project_dir, capture_output=True, text=True, creationflags=cflags)
+        if status.stdout.strip():
+            subprocess.run(['git', 'commit', '-m', 'Automated sync via LLB_cli'], cwd=project_dir, capture_output=True, creationflags=cflags)
+            subprocess.run(['git', 'push', 'origin', 'main'], cwd=project_dir, check=True, creationflags=cflags)
+            print(f"✅ Code synchronisé et poussé sur GitHub avec succès ({project_name_clean})")
+        else:
+            print("✅ Aucun changement détecté. Le code est déjà à jour.")
+        return
+
+    # --- LOGIQUE DE CRÉATION DE PROJET ---
     print(f"[*] Contacting GitHub API to create repository '{project_name_clean}'...")
     try:
         repo_url = create_github_repo(username, pat, project_name_clean)
@@ -99,11 +122,6 @@ def setup_workspace(project_name, username, pat):
         print(f"[!] Error creating GitHub repository: {e}")
         return
 
-    desktop = Path(os.path.expanduser("~")) / "Desktop"
-    master_workspace = desktop / "Robomotion_Workspace"
-    master_workspace.mkdir(parents=True, exist_ok=True)
-    
-    project_dir = master_workspace / project_name_clean
     project_dir.mkdir(parents=True, exist_ok=True)
     print(f"[*] Created project workspace at: {project_dir}")
     
@@ -132,8 +150,6 @@ def setup_workspace(project_name, username, pat):
     repo_clean = repo_url.replace("https://", "")
     safe_username = urllib.parse.quote(username)
     auth_url = f"https://{safe_username}:{pat}@{repo_clean}"
-    
-    cflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
     
     print("[*] Initializing Git repository and pushing...")
     if not (project_dir / '.git').exists():
