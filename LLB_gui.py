@@ -16,8 +16,16 @@ import shutil
 from pathlib import Path
 import webbrowser
 import json
-import urllib.request
 import urllib.error
+import urllib.parse
+
+def load_env(env_path):
+    if os.path.exists(env_path):
+        with open(env_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                if '=' in line and not line.startswith('#'):
+                    key, val = line.strip().split('=', 1)
+                    os.environ[key] = val
 
 # --- PROMPT AGENT ---
 AGENT_PROMPT = """# SYSTEM INSTRUCTIONS: EXPERT DEVELOPER ROBOMOTION RPA
@@ -188,6 +196,14 @@ entry_user.grid(row=1, column=1, pady=5, padx=5)
 tk.Label(frame, text="PAT Token (Key):").grid(row=2, column=0, sticky="w", pady=5)
 entry_pat = tk.Entry(frame, width=45, show="*")
 entry_pat.grid(row=2, column=1, pady=5, padx=5)
+
+# Load .env variables if they exist
+env_file = Path(__file__).parent / ".env"
+load_env(env_file)
+if os.environ.get("GITHUB_USERNAME"):
+    entry_user.insert(0, os.environ.get("GITHUB_USERNAME"))
+if os.environ.get("GITHUB_PAT"):
+    entry_pat.insert(0, os.environ.get("GITHUB_PAT"))
 
 tk.Button(root, text="🔥 Auto-Create Repo & Generate Workspace", bg="#2c3e50", fg="white", font=("Helvetica", 11, "bold"), command=setup_workspace).pack(pady=15)
 
