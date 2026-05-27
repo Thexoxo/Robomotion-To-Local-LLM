@@ -1,3 +1,13 @@
+# ==============================================================================
+# Local LLM to Robomotion Bridge
+# Copyright (C) 2026 Thexoxo (https://github.com/Thexoxo)
+# YouTube: https://www.youtube.com/@xoxoPwn
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License.
+# ==============================================================================
+
 import tkinter as tk
 from tkinter import messagebox
 import os
