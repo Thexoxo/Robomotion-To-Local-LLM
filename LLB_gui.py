@@ -184,14 +184,15 @@ tk.Button(root, text="🔥 Auto-Create Repo & Generate Workspace", bg="#2c3e50",
 instructions_frame = tk.LabelFrame(root, text=" 📖 How to use this tool? (Tutorial) ", font=("Helvetica", 10, "bold"), padx=15, pady=15)
 instructions_frame.pack(fill="both", expand=True, pady=10)
 
-instructions_text = """Step 1: Fill out the fields above. The software will auto-create 
-a private repository on your GitHub using the API.
+instructions_text = """Step 1: Generate a GitHub PAT (Classic Token) with 'repo' 
+permissions enabled! Then, fill out the fields above. The software 
+will auto-create a private repository using the API.
 
-Step 2: Open your local LLM / AI Agent (Anti Gravity, LM Studio, IDE) 
+Step 2: Open your local LLM / AI Agent (Anti Gravity, LM Studio) 
 in the generated folder on your Desktop. Give it the prompt: 
 "Read agent_rules.md and build the automation flow."
 
-Step 3: AUTO-SYNC! Let the AI write the code. This background script 
+Step 3: AUTO-SYNC! Let the AI write the code. This script 
 will automatically push the generated code directly to GitHub.
 
 Step 4: Go to Robomotion Designer -> Click 'Import Flow' -> 'From Git'.
