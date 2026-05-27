@@ -204,9 +204,12 @@ Step 4: Go to Robomotion Designer -> Click 'Import Flow' -> 'From Git'.
 tk.Label(instructions_frame, text=instructions_text, justify="left", font=("Consolas", 9), fg="#333333").pack(anchor="w")
 
 links_frame = tk.Frame(root)
-links_frame.pack(side="bottom")
+links_frame.pack(side="bottom", fill="x", pady=5)
 
 tk.Button(links_frame, text="▶️ YouTube", command=open_youtube, cursor="hand2", bg="#ff0000", fg="white", font=("Helvetica", 9, "bold")).pack(side="left", padx=10)
 tk.Button(links_frame, text="🐙 GitHub", command=open_github, cursor="hand2", bg="#333333", fg="white", font=("Helvetica", 9, "bold")).pack(side="left", padx=10)
+
+signature = tk.Label(links_frame, text="Made with 🌍 ❤️ by xoxo", font=("Helvetica", 9, "italic"), fg="#666666")
+signature.pack(side="right", padx=10)
 
 root.mainloop()
