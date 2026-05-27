@@ -7,25 +7,32 @@ Welcome to the Local LLM to Robomotion Bridge! Follow the steps below to setup y
 
 ## 📖 Step-by-Step Tutorial
 
-### Step 1: Run the Setup
-Launch the `gui_installer.py` (or the `.exe` if provided). Fill out the fields:
+### Step 1: Generate your GitHub PAT (Personal Access Token)
+Before running the setup, you must generate a GitHub Token:
+1. Go to your GitHub account **Settings** > **Developer Settings** > **Personal access tokens** > **Tokens (classic)**.
+2. Click **Generate new token (classic)** (Do NOT select "Fine-grained token").
+3. Give it a name and **check the `repo` checkbox** (this grants full control of private repositories).
+4. Click Generate and copy the token (`ghp_...`).
+
+### Step 2: Run the Setup
+Launch `LLB_gui.py` (or use `LLB_cli.py` in the terminal). Fill out the fields:
 - **Project Name**: The folder name that will be created on your Desktop. It will also be the name of your auto-created GitHub repository!
 - **GitHub Username**: Your GitHub handle.
-- **PAT Token**: Your GitHub Personal Access Token (with 'repo' scopes).
+- **PAT Token**: The GitHub Personal Access Token you just created.
 
 Click the "🔥 Auto-Create Repo & Generate Workspace" button. The software will use the GitHub API to magically create the private repository for you, create the local folder, copy the Robomotion documentation, create the rules for your AI (`agent_rules.md`), and securely sync everything to your GitHub.
 
-### Step 2: Boot your Local AI
+### Step 3: Boot your Local AI
 Open your local AI agent (like **LM Studio**, **Anti Gravity**, **Cursor**, etc.) and load the newly created project folder on your Desktop.
 
 Give it the following instruction:
 > *"Read the `agent_rules.md` file and build the automation flow."*
 
-### Step 3: Let the AI Auto-Sync
+### Step 4: Let the AI Auto-Sync
 The AI will generate the TypeScript code (`main.ts`).
 As soon as the code is saved, our background Auto-Push logic automatically synchronizes and pushes the files straight to your GitHub repository! You don't have to type any git commands.
 
-### Step 4: Import into Robomotion Designer
+### Step 5: Import into Robomotion Designer
 Finally, import the AI's work into the Robomotion Cloud interface:
 1. Go to Robomotion Designer.
 2. Click **'Import Flow'** -> **'From Git'**.
