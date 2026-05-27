@@ -86,13 +86,17 @@ def setup_workspace():
         return
         
     try:
+        import urllib.parse
+        
+        project_name_clean = project_name.replace(" ", "-")
+        
         # 0. Magically create the repository on GitHub
         messagebox.showinfo("Processing", "Contacting GitHub API to create repository...")
-        repo_url = create_github_repo(username, pat, project_name)
+        repo_url = create_github_repo(username, pat, project_name_clean)
         
         # Paths definition
         desktop = Path(os.path.expanduser("~")) / "Desktop"
-        workspace = desktop / project_name
+        workspace = desktop / project_name_clean
         
         script_dir = Path(__file__).parent
         source_docs = script_dir / 'skills-fallback'
@@ -117,7 +121,10 @@ def setup_workspace():
             f.write(f"GITHUB_USERNAME={username}\nGITHUB_PAT={pat}\nGITHUB_REPO={repo_url}\n")
             
         repo_clean = repo_url.replace("https://", "")
-        auth_url = f"https://{username}:{pat}@{repo_clean}"
+        # URL encode the username to prevent issues if user inputs an email address
+        safe_username = urllib.parse.quote(username)
+        # Using only PAT as credentials often bypasses Git Credential Manager issues
+        auth_url = f"https://{safe_username}:{pat}@{repo_clean}"
         
         cflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
         if not (workspace / '.git').exists():
