@@ -1,6 +1,6 @@
-# 🚀 RPA Workspace Generator - How to Use
+# 🚀 Local LLM to Robomotion Bridge - How to Use
 
-Welcome to the RPA Workspace Generator! This tool connects your Local LLM AI with Robomotion and GitHub.
+Welcome to the Local LLM to Robomotion Bridge! This tool connects your Local LLM AI with Robomotion and GitHub.
 
 ## 📖 Step-by-Step Tutorial
 
