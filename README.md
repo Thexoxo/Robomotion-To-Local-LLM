@@ -9,12 +9,11 @@ Welcome to the Local LLM to Robomotion Bridge! Follow the steps below to setup y
 
 ### Step 1: Run the Setup
 Launch the `gui_installer.py` (or the `.exe` if provided). Fill out the fields:
-- **Project Name**: The folder name that will be created on your Desktop.
+- **Project Name**: The folder name that will be created on your Desktop. It will also be the name of your auto-created GitHub repository!
 - **GitHub Username**: Your GitHub handle.
 - **PAT Token**: Your GitHub Personal Access Token (with 'repo' scopes).
-- **GitHub Repo URL**: Link to your repository (e.g. `https://github.com/User/Repo.git`).
 
-Click the "🔥 Generate Workspace" button. The software will create the folder, copy the Robomotion documentation, create the rules for your AI (`agent_rules.md`), and securely sync everything to your GitHub.
+Click the "🔥 Auto-Create Repo & Generate Workspace" button. The software will use the GitHub API to magically create the private repository for you, create the local folder, copy the Robomotion documentation, create the rules for your AI (`agent_rules.md`), and securely sync everything to your GitHub.
 
 ### Step 2: Boot your Local AI
 Open your local AI agent (like **LM Studio**, **Anti Gravity**, **Cursor**, etc.) and load the newly created project folder on your Desktop.
