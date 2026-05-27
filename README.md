@@ -23,7 +23,7 @@ Launch `LLB_gui.py` (or use `LLB_cli.py` in the terminal). Fill out the fields:
 Click the "🔥 Auto-Create Repo & Generate Workspace" button. The software will use the GitHub API to magically create the private repository for you, create the local folder, copy the Robomotion documentation, create the rules for your AI (`agent_rules.md`), and securely sync everything to your GitHub.
 
 ### Step 3: Boot your Local AI
-Open your local AI agent (like **LM Studio**, **Anti Gravity**, **Cursor**, etc.) and load the newly created project folder on your Desktop.
+Open your local AI agent (like **LM Studio**, **Anti Gravity**, **Cursor**, etc.) and load your newly created specific project folder (inside `Robomotion_Workspace`) on your Desktop.
 
 Give it the following instruction:
 > *"Read the `agent_rules.md` file and build the automation flow."*

@@ -22,11 +22,11 @@ from pathlib import Path
 AGENT_PROMPT = """# SYSTEM INSTRUCTIONS: EXPERT DEVELOPER ROBOMOTION RPA
 
 [CONTEXT AND ROLE]
-You are an elite development agent for Robomotion RPA. Your mission is to design from scratch, modify, and deploy a 100% autonomous automation flow in this local workspace. You will generate the required 'main.ts' and 'main.designer.ts' files, then push them to the remote Git repository so they appear on the online Designer.
+You are an elite development agent for Robomotion RPA working in a Centralized Workspace. Your mission is to design from scratch, modify, and deploy a 100% autonomous automation flow. You will write the required 'main.ts' and 'main.designer.ts' files inside the specific project's subfolder, then push them to the remote Git repository.
 
 [STEP 1: SIMULTANEOUS LEARNING (MANDATORY)]
 Before writing any code, you must deeply analyze the official SDK documentation, grammar, and design patterns stored locally on this machine at the following exact path:
-"./skills-fallback/skills/creating-flow/docs/"
+"../skills-fallback/skills/creating-flow/docs/"
 
 [STEP 2: IRON LAWS OF SYNTAX (STRICT COMPLIANCE REQUIRED)]
 For the code to be valid and accepted by Robomotion, you must apply these 5 laws:
@@ -42,13 +42,13 @@ import { flow, Message, Custom, JS, Global, Flow, Credential, AI } from '@robomo
 5. DATA TABLE FORMAT: For any data manipulation (CSV, Excel), the msg.table property must strictly follow this JSON object structure: { columns: [...], rows: [...] }.
 
 [STEP 3: DEPLOYMENT AND AUTO-PUSH PROCESS]
-Once you have written the 'main.ts' and 'main.designer.ts' files without errors, you are authorized to open the system terminal to autonomously execute the following sequence of Git commands to publish the flow to the Cloud:
+Once you have written the 'main.ts' and 'main.designer.ts' files in the target project folder without errors, you are authorized to open the system terminal, navigate to the specific project folder (cd ./ProjectFolder), and autonomously execute the following sequence of Git commands to publish the flow to the Cloud:
 1. git add .
 2. git commit -m "Automated workflow generation and sync by AI Agent"
 3. git push origin main
 
 [YOUR MISSION]
-Design the complete 'main.ts' and 'main.designer.ts' files, validate them, then execute the Auto-Push process for the following action:
+Design the complete 'main.ts' and 'main.designer.ts' files for my project subfolder, validate them, then execute the Auto-Push process from inside that folder for the following action:
 --> [WRITE YOUR SPECIFIC GOAL HERE, EX: A robot that logs into a site, scrapes a data table, and saves it as CSV] <--
 """
 
@@ -87,30 +87,33 @@ def setup_workspace(project_name, username, pat):
         return
 
     desktop = Path(os.path.expanduser("~")) / "Desktop"
-    workspace = desktop / project_name_clean
+    master_workspace = desktop / "Robomotion_Workspace"
+    master_workspace.mkdir(parents=True, exist_ok=True)
+    
+    project_dir = master_workspace / project_name_clean
+    project_dir.mkdir(parents=True, exist_ok=True)
+    print(f"[*] Created project workspace at: {project_dir}")
+    
     script_dir = Path(__file__).parent
     source_docs = script_dir / 'skills-fallback'
     
-    workspace.mkdir(parents=True, exist_ok=True)
-    print(f"[*] Created local workspace at: {workspace}")
-    
-    dest_skills = workspace / "skills-fallback"
+    dest_skills = master_workspace / "skills-fallback"
     if source_docs.exists() and not dest_skills.exists():
         shutil.copytree(source_docs, dest_skills)
-        print("[+] Copied Robomotion documentation (skills-fallback).")
+        print("[+] Copied Robomotion documentation (skills-fallback) to workspace root.")
     elif not source_docs.exists():
         print("[!] Warning: 'skills-fallback' folder not found. AI will lack documentation.")
         
-    with open(workspace / "agent_rules.md", "w", encoding="utf-8") as f:
+    with open(project_dir / "agent_rules.md", "w", encoding="utf-8") as f:
         f.write(AGENT_PROMPT)
-    print("[+] Created agent_rules.md")
+    print("[+] Created agent_rules.md inside project folder")
         
-    with open(workspace / "main.ts", "w", encoding="utf-8") as f:
+    with open(project_dir / "main.ts", "w", encoding="utf-8") as f:
         f.write("import { flow, Message, Custom, JS, Global, Flow, Credential, AI } from '@robomotion/sdk';\n\nconst myFlow = flow.create('main', 'New Flow', (f) => {});\nmyFlow.start();")
-    with open(workspace / "main.designer.ts", "w", encoding="utf-8") as f:
+    with open(project_dir / "main.designer.ts", "w", encoding="utf-8") as f:
         f.write("import { flow, Message, Custom, JS, Global, Flow, Credential, AI } from '@robomotion/sdk';\n\nconst myFlow = flow.create('main', 'New Flow', (f) => {});\nmyFlow.start();")
         
-    with open(workspace / ".env", "w", encoding="utf-8") as f:
+    with open(project_dir / ".env", "w", encoding="utf-8") as f:
         f.write(f"GITHUB_USERNAME={username}\nGITHUB_PAT={pat}\nGITHUB_REPO={repo_url}\n")
         
     repo_clean = repo_url.replace("https://", "")
@@ -120,17 +123,18 @@ def setup_workspace(project_name, username, pat):
     cflags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
     
     print("[*] Initializing Git repository and pushing...")
-    if not (workspace / '.git').exists():
-        subprocess.run(['git', 'init'], cwd=workspace, check=True, creationflags=cflags)
+    if not (project_dir / '.git').exists():
+        subprocess.run(['git', 'init'], cwd=project_dir, check=True, creationflags=cflags)
         
-    subprocess.run(['git', 'add', '.'], cwd=workspace, check=True, creationflags=cflags)
-    subprocess.run(['git', 'commit', '-m', 'Workspace initialization via LLB CLI'], cwd=workspace, capture_output=True, creationflags=cflags)
-    subprocess.run(['git', 'remote', 'remove', 'origin'], cwd=workspace, capture_output=True, creationflags=cflags)
-    subprocess.run(['git', 'remote', 'add', 'origin', auth_url], cwd=workspace, check=True, creationflags=cflags)
-    subprocess.run(['git', 'branch', '-M', 'main'], cwd=workspace, check=True, creationflags=cflags)
-    subprocess.run(['git', 'push', '-u', 'origin', 'main'], cwd=workspace, check=True, creationflags=cflags)
+    subprocess.run(['git', 'add', '.'], cwd=project_dir, check=True, creationflags=cflags)
+    subprocess.run(['git', 'commit', '-m', 'Workspace initialization via LLB CLI'], cwd=project_dir, capture_output=True, creationflags=cflags)
+    subprocess.run(['git', 'remote', 'remove', 'origin'], cwd=project_dir, capture_output=True, creationflags=cflags)
+    subprocess.run(['git', 'remote', 'add', 'origin', auth_url], cwd=project_dir, check=True, creationflags=cflags)
+    subprocess.run(['git', 'branch', '-M', 'main'], cwd=project_dir, check=True, creationflags=cflags)
+    subprocess.run(['git', 'push', '-u', 'origin', 'main'], cwd=project_dir, check=True, creationflags=cflags)
     
     print("\n✅ Success! Workspace generated and synced to GitHub.")
+    print("   Open 'Robomotion_Workspace' in your AI to begin.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Local LLM to Robomotion Bridge (CLI)")
