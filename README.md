@@ -1,6 +1,9 @@
 # 🚀 Local LLM to Robomotion Bridge - How to Use
 
-Welcome to the Local LLM to Robomotion Bridge! This tool connects your Local LLM AI with Robomotion and GitHub.
+**What is this tool?**
+The *Local LLM to Robomotion Bridge* is a 1-click open-source tool designed to seamlessly connect your local, free AI (like LM Studio, Ollama, or Anti Gravity) with the Robomotion RPA platform. It allows you to build powerful, autonomous automation robots (RPA) directly on your local machine without paying for expensive AI API tokens, and syncs the generated code directly to your Robomotion cloud workspace.
+
+Welcome to the Local LLM to Robomotion Bridge! Follow the steps below to setup your factory.
 
 ## 📖 Step-by-Step Tutorial
 
